@@ -1,0 +1,8 @@
+# Datos y páginas generados en local (p. ej. con datos simulados).
+# GitHub Actions los añade a la fuerza ("git add -f") cuando son REALES.
+datos/
+docs/index.html
+
+# Archivos temporales que crea Python
+__pycache__/
+*.pyc

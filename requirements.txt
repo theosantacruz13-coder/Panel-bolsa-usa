@@ -1,0 +1,6 @@
+# Librerías que necesita el proyecto. Se instalan con:
+#   pip install -r requirements.txt
+yfinance>=0.2.50   # lee precios públicos de Yahoo Finance (no es un bróker)
+pandas>=2.0        # tablas de datos
+numpy>=1.24        # cálculos numéricos
+matplotlib>=3.7    # gráficos

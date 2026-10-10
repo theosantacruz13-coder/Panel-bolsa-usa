@@ -1,0 +1,44 @@
+# GitHub Actions: un ordenador de GitHub ejecuta estos pasos por nosotros,
+# gratis, aunque tengamos el móvil apagado. Descarga datos REALES de Yahoo,
+# rehace la página web y guarda (commit) el resultado en el repositorio.
+name: Actualizar datos
+
+on:
+  # Botón "Run workflow" en la pestaña Actions (se puede pulsar desde el móvil).
+  workflow_dispatch:
+  # Automático: de lunes a viernes a las 21:30 UTC, después del cierre de Wall Street.
+  schedule:
+    - cron: "30 21 * * 1-5"
+
+# Permiso para que el robot pueda hacer commit de los datos nuevos.
+permissions:
+  contents: write
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar librerías
+        run: pip install -r requirements.txt
+
+      - name: Descargar precios de Yahoo Finance
+        run: python descargar_datos.py
+
+      - name: Crear la página con los gráficos
+        run: python explorar.py
+
+      - name: Guardar los resultados en el repositorio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git add -f datos/ docs/index.html
+          git commit -m "Datos actualizados $(date -u '+%Y-%m-%d %H:%M UTC')" || echo "Sin cambios"
+          git push
