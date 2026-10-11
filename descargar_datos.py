@@ -63,6 +63,10 @@ def a_formato_nuestro(df, formato_fecha, columna_tiempo):
     # cotiza la bolsa (abre a las 9:30 y cierra a las 16:00, hora local).
     if columna_tiempo == "fecha_hora":
         df.index = df.index.tz_convert("America/New_York")
+        # Nos quedamos solo con el horario normal: velas de 9:30 a 15:55
+        # (la de 15:55 termina a las 16:00). Hace falta porque el VIX
+        # cotiza también de madrugada y "prepost=False" no lo filtra.
+        df = df.between_time("09:30", "15:55")
     df[columna_tiempo] = df.index.strftime(formato_fecha)
     return df[[columna_tiempo] + almacen.COLUMNAS_PRECIO]
 
@@ -116,6 +120,9 @@ if __name__ == "__main__":
 
     # Anotamos que estos datos son reales (explorar.py lo comprueba).
     if len(fallidos) < len(config.TODOS):
+        borradas = almacen.borrar_fuera_de_horario()
+        if borradas:
+            print(f"\nBorradas {borradas} velas fuera del horario normal de mercado.")
         almacen.guardar_metadato("origen", "yahoo")
         almacen.guardar_metadato("actualizado", time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()))
         almacen.exportar_csv()

@@ -96,6 +96,19 @@ def guardar_precios(tabla, ticker, df):
     return len(filas)
 
 
+def borrar_fuera_de_horario():
+    # Borra velas intradía guardadas fuera del horario normal (9:30-15:55,
+    # hora de Nueva York). substr(fecha_hora, 12, 5) recorta la parte
+    # "HH:MM" del texto 'AAAA-MM-DD HH:MM'. Devuelve cuántas filas borró.
+    with conectar() as conexion:
+        cursor = conexion.execute(
+            "DELETE FROM intradia "
+            "WHERE substr(fecha_hora, 12, 5) < '09:30' "
+            "   OR substr(fecha_hora, 12, 5) > '15:55'"
+        )
+    return cursor.rowcount
+
+
 def guardar_metadato(clave, valor):
     # Apunta una nota en la tabla "metadatos" (p. ej. origen = 'yahoo').
     with conectar() as conexion:
