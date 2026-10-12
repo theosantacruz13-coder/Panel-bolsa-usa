@@ -35,10 +35,13 @@ jobs:
       - name: Crear la página con los gráficos
         run: python explorar.py
 
+      - name: Calcular las señales y crear su página
+        run: python senales.py
+
       - name: Guardar los resultados en el repositorio
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
-          git add -f datos/ docs/index.html
+          git add -f datos/ docs/index.html docs/senales.html
           git commit -m "Datos actualizados $(date -u '+%Y-%m-%d %H:%M UTC')" || echo "Sin cambios"
           git push
