@@ -2,6 +2,7 @@
 # GitHub Actions los añade a la fuerza ("git add -f") cuando son REALES.
 datos/
 docs/index.html
+docs/senales.html
 
 # Archivos temporales que crea Python
 __pycache__/

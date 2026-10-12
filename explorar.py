@@ -64,6 +64,34 @@ plt.rcParams.update({
 })
 
 
+# Estilos (CSS) de las páginas web, compartidos por todas las fases.
+# Es un texto normal (no f-string), por eso las llaves { } van sencillas.
+ESTILO = """<style>
+  /* Colores como "variables" para poder cambiar a modo oscuro fácilmente */
+  :root { --fondo:#f7f7f5; --tarjeta:#ffffff; --texto:#0b0b0b; --suave:#52514e; --borde:#e6e5e0; }
+  @media (prefers-color-scheme: dark) {
+    :root { --fondo:#121211; --tarjeta:#1a1a19; --texto:#f0efec; --suave:#c3c2b7; --borde:#2e2e2c; }
+  }
+  body { margin:0; background:var(--fondo); color:var(--texto);
+         font:16px/1.5 system-ui, -apple-system, sans-serif; }
+  main { max-width:760px; margin:auto; padding:16px; }
+  h1 { font-size:1.4rem; margin:.2em 0; }
+  h2 { font-size:1.1rem; margin:0 0 .4em; }
+  .sub { color:var(--suave); font-size:.9rem; }
+  .tarjeta { background:var(--tarjeta); border:1px solid var(--borde); border-radius:12px;
+             padding:14px; margin:14px 0; }
+  /* Las imágenes tienen fondo blanco: las ponemos sobre blanco también en modo oscuro */
+  img { width:100%; height:auto; background:#fff; border-radius:8px; }
+  table { width:100%; border-collapse:collapse; font-size:.92rem; font-variant-numeric:tabular-nums; }
+  th, td { padding:6px 4px; border-bottom:1px solid var(--borde); text-align:right; }
+  th:first-child, td:first-child { text-align:left; }
+  .aviso { background:#fdecc8; color:#5a3d00; border-radius:10px; padding:12px; margin:12px 0; }
+  nav a { margin-right:12px; }
+  .cifra { font-size:2rem; font-weight:700; }
+  details summary { cursor:pointer; color:var(--suave); }
+</style>"""
+
+
 def figura_a_html(figura, texto_alternativo):
     # Convierte una figura de matplotlib en una etiqueta <img> con la imagen
     # incrustada como texto base64.
@@ -239,32 +267,11 @@ def crear_pagina():
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mercado EE.UU. – Fase 1</title>
-<style>
-  /* Colores como "variables" para poder cambiar a modo oscuro fácilmente */
-  :root {{ --fondo:#f7f7f5; --tarjeta:#ffffff; --texto:#0b0b0b; --suave:#52514e; --borde:#e6e5e0; }}
-  @media (prefers-color-scheme: dark) {{
-    :root {{ --fondo:#121211; --tarjeta:#1a1a19; --texto:#f0efec; --suave:#c3c2b7; --borde:#2e2e2c; }}
-  }}
-  body {{ margin:0; background:var(--fondo); color:var(--texto);
-         font:16px/1.5 system-ui, -apple-system, sans-serif; }}
-  main {{ max-width:760px; margin:auto; padding:16px; }}
-  h1 {{ font-size:1.4rem; margin:.2em 0; }}
-  h2 {{ font-size:1.1rem; margin:0 0 .4em; }}
-  .sub {{ color:var(--suave); font-size:.9rem; }}
-  .tarjeta {{ background:var(--tarjeta); border:1px solid var(--borde); border-radius:12px;
-             padding:14px; margin:14px 0; }}
-  /* Las imágenes tienen fondo blanco: las ponemos sobre blanco también en modo oscuro */
-  img {{ width:100%; height:auto; background:#fff; border-radius:8px; }}
-  table {{ width:100%; border-collapse:collapse; font-size:.92rem; font-variant-numeric:tabular-nums; }}
-  th, td {{ padding:6px 4px; border-bottom:1px solid var(--borde); text-align:right; }}
-  th:first-child, td:first-child {{ text-align:left; }}
-  .aviso {{ background:#fdecc8; color:#5a3d00; border-radius:10px; padding:12px; margin:12px 0; }}
-  .cifra {{ font-size:2rem; font-weight:700; }}
-  details summary {{ cursor:pointer; color:var(--suave); }}
-</style>
+{ESTILO}
 </head>
 <body>
 <main>
+<nav class="sub"><b>Exploración</b> <a href="senales.html">Señales</a></nav>
 <h1>Mercado de EE.UU. · Fase 1: exploración</h1>
 <div class="sub">Datos: {html.escape(origen)} · actualizado {html.escape(actualizado)}</div>
 {aviso}
