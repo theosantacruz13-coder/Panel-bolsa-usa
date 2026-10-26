@@ -3,6 +3,7 @@
 datos/
 docs/index.html
 docs/senales.html
+docs/backtest.html
 
 # Archivos temporales que crea Python
 __pycache__/

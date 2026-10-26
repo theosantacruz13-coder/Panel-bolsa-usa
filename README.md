@@ -14,7 +14,7 @@ con comentarios en español, y pensado para aprender desde cero.
 |------|----------|----------|--------|
 | 1 | Descarga de datos y exploración con gráficos | `config.py`, `almacen.py`, `descargar_datos.py`, `datos_ejemplo.py`, `explorar.py` | ✅ Hecha |
 | 2 | Señales: régimen VIX, medias 50/200, RSI → COMPRAR / MANTENER / REDUCIR | `indicadores.py`, `senales.py` | ✅ Hecha |
-| 3 | Backtesting honesto (comisiones, deslizamiento, entrenamiento/prueba, vs SPY) | — | ⏳ Pendiente |
+| 3 | Backtesting honesto (comisiones, deslizamiento, entrenamiento/prueba, vs SPY) | `backtest.py`, `informe_backtest.py` | ✅ Hecha |
 | 4 | Simulador en tiempo real con cartera virtual de 10.000 USD | — | ⏳ Pendiente |
 | 5 | Dashboard HTML para el móvil | — | ⏳ Pendiente |
 
@@ -41,10 +41,13 @@ datos_ejemplo.py     ← FASE 1: genera precios INVENTADOS para probar sin inter
 explorar.py          ← FASE 1: crea docs/index.html con gráficos y explicaciones
 indicadores.py       ← FASE 2: régimen del VIX, medias móviles 50/200 y RSI
 senales.py           ← FASE 2: reglas COMPRAR/MANTENER/REDUCIR y docs/senales.html
+backtest.py          ← FASE 3: motor de simulación con comisiones, deslizamiento y métricas
+informe_backtest.py  ← FASE 3: ejecuta las pruebas y crea docs/backtest.html
 datos/mercado.db     ← base de datos SQLite (se crea al descargar)
 datos/csv/           ← copia de los datos en CSV, un archivo por activo
 docs/index.html      ← página de exploración (Fase 1)
 docs/senales.html    ← página de señales (Fase 2)
+docs/backtest.html   ← página del backtest (Fase 3)
 .github/workflows/   ← automatización: GitHub descarga los datos por ti
 ```
 
@@ -68,6 +71,7 @@ pip install -r requirements.txt   # instala las librerías (una sola vez)
 python descargar_datos.py         # descarga los datos reales (1-2 minutos)
 python explorar.py                # crea docs/index.html
 python senales.py                 # crea docs/senales.html
+python informe_backtest.py        # crea docs/backtest.html (tarda ~1 minuto)
 ```
 
 Sin internet, puedes probar con datos inventados:
@@ -92,6 +96,17 @@ Se calculan cada día con el cierre del S&P 500 y el VIX. Las reglas se aplican 
 
 La señal de un día usa el precio de cierre de ese día, así que solo se podría
 actuar en la sesión siguiente (importante para no hacer trampas en la Fase 3).
+
+## El backtest (Fase 3)
+
+- 10.000 USD ficticios en SPY desde el primer día con señal (17/10/2007).
+- La señal se calcula al cierre y la orden se ejecuta en la **apertura del día siguiente**
+  (sin "look-ahead bias").
+- Cada compra o venta paga 0,05 % de comisión y 0,05 % de deslizamiento. El efectivo no cobra intereses.
+- Estrategias: la **completa** de la Fase 2 (REDUCIR = salir del todo), **solo VIX**
+  (entrar con VIX < 20, salir con VIX ≥ 30) y **comprar y mantener SPY** como referencia.
+- Entrenamiento 2007-2016 y prueba 2017-hoy, más dos experimentos: sobreajuste de umbrales
+  y el efecto de ejecutar "con trampa" al cierre del mismo día.
 
 ## Datos que se guardan
 

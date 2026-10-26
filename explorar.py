@@ -271,7 +271,7 @@ def crear_pagina():
 </head>
 <body>
 <main>
-<nav class="sub"><b>Exploración</b> <a href="senales.html">Señales</a></nav>
+<nav class="sub"><b>Exploración</b> <a href="senales.html">Señales</a> <a href="backtest.html">Backtest</a></nav>
 <h1>Mercado de EE.UU. · Fase 1: exploración</h1>
 <div class="sub">Datos: {html.escape(origen)} · actualizado {html.escape(actualizado)}</div>
 {aviso}
