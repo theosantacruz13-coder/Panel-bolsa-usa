@@ -1,0 +1,20 @@
+# Ejecuta las pruebas automáticas (tests/) en cada Pull Request.
+# Si alguna falla, el PR muestra una cruz roja antes de fusionarlo.
+# Consume ~1 minuto de GitHub Actions por cada push a un PR.
+name: Pruebas
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Comprobar que nada mira al futuro
+        run: python -m unittest discover tests -v

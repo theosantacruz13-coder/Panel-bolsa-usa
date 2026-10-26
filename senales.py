@@ -48,27 +48,28 @@ def tendencia(fila):
     #            por encima de la de 200 (sube a corto y a largo plazo).
     #   bajista: lo contrario (precio y media de 50 por debajo de la de 200).
     #   mixta:   las pistas se contradicen.
-    if fila.precio > fila.media_200 and fila.media_50 > fila.media_200:
+    if fila.precio > fila.media_larga and fila.media_corta > fila.media_larga:
         return "alcista"
-    if fila.precio < fila.media_200 and fila.media_50 < fila.media_200:
+    if fila.precio < fila.media_larga and fila.media_corta < fila.media_larga:
         return "bajista"
     return "mixta"
 
 
-def decidir(fila):
+def decidir(fila, corta=ind.MEDIA_CORTA, larga=ind.MEDIA_LARGA):
     # Recibe una fila de la tabla de indicadores y devuelve (señal, razón).
     # Las reglas van en orden: la primera que se cumple decide.
+    # "corta" y "larga" (días de cada media) solo se usan en los textos.
 
     # Sin 200 días de historia todavía no hay media de 200 → no opinamos.
     # pd.isna() comprueba si un valor está vacío (NaN).
-    if pd.isna(fila.media_200) or pd.isna(fila.rsi):
+    if pd.isna(fila.media_larga) or pd.isna(fila.rsi):
         return "SIN DATOS", "Aún no hay 200 días de historia para calcular la tendencia."
 
     t = tendencia(fila)
     vix = f"el VIX está en zona «{fila.regimen}» ({fila.vix:.1f})"
     rsi = f"el RSI es {fila.rsi:.0f}"
-    medias = (f"precio {fila.precio:,.0f}, media de 50 días {fila.media_50:,.0f}, "
-              f"media de 200 días {fila.media_200:,.0f}")
+    medias = (f"precio {fila.precio:,.0f}, media de {corta} días {fila.media_corta:,.0f}, "
+              f"media de {larga} días {fila.media_larga:,.0f}")
 
     if t == "alcista":
         if fila.regimen == "pánico":
@@ -77,13 +78,13 @@ def decidir(fila):
         if fila.rsi >= ind.RSI_SOBRECOMPRA:
             return "MANTENER", (f"La tendencia es alcista ({medias}), pero {rsi}: ha subido muy "
                                 "deprisa (sobrecompra). Mejor no perseguir el precio.")
-        return "COMPRAR", (f"Tendencia alcista: el precio está por encima de la media de 200 días "
-                           f"y la media de 50 por encima de la de 200 ({medias}). Además {vix} "
+        return "COMPRAR", (f"Tendencia alcista: el precio está por encima de la media de {larga} días "
+                           f"y la media de {corta} por encima de la de {larga} ({medias}). Además {vix} "
                            f"y {rsi}, sin sobrecompra.")
 
     if t == "bajista":
-        razon = (f"Tendencia bajista: el precio y la media de 50 días están por debajo de la "
-                 f"de 200 ({medias}); {vix}.")
+        razon = (f"Tendencia bajista: el precio y la media de {corta} días están por debajo de la "
+                 f"de {larga} ({medias}); {vix}.")
         if fila.rsi <= ind.RSI_SOBREVENTA:
             razon += (f" Ojo: {rsi} (sobreventa), puede haber rebotes, "
                       "pero la tendencia de fondo sigue siendo bajista.")
@@ -97,12 +98,15 @@ def decidir(fila):
                         "Sin motivo fuerte para comprar ni para vender: esperar.")
 
 
-def calcular_senales():
+def calcular_senales(corta=ind.MEDIA_CORTA, larga=ind.MEDIA_LARGA, ajuste_vix=0, cierres=None):
     # Tabla con indicadores + señal + razón para cada día del histórico.
-    cierres = almacen.leer_cierres_diarios(["^GSPC", "^VIX"])
-    tabla = ind.calcular_indicadores(cierres["^GSPC"], cierres["^VIX"])
+    # Los parámetros solo se cambian para las pruebas de robustez; "cierres"
+    # permite pasar datos recortados (para comprobar que no se mira el futuro).
+    if cierres is None:
+        cierres = almacen.leer_cierres_diarios(["^GSPC", "^VIX"])
+    tabla = ind.calcular_indicadores(cierres["^GSPC"], cierres["^VIX"], corta, larga, ajuste_vix)
     # .apply(..., axis=1) ejecuta "decidir" fila por fila.
-    resultado = tabla.apply(decidir, axis=1, result_type="expand")
+    resultado = tabla.apply(decidir, axis=1, result_type="expand", corta=corta, larga=larga)
     tabla["senal"], tabla["razon"] = resultado[0], resultado[1]
     return tabla
 
@@ -140,7 +144,7 @@ def grafico_historico(tabla):
     figura, eje = plt.subplots(figsize=(7, 4))
     pintar_fondo(eje, tabla)
     eje.plot(tabla.index, tabla["precio"], color="#0b0b0b", linewidth=1, label="S&P 500")
-    eje.plot(tabla.index, tabla["media_200"], color="#2a78d6", linewidth=1, label="media 200 d")
+    eje.plot(tabla.index, tabla["media_larga"], color="#2a78d6", linewidth=1, label="media 200 d")
     eje.set_yscale("log")
     # En escala log ponemos las marcas a mano para que se lean bien.
     eje.set_yticks([500, 1000, 2000, 4000, 8000])
@@ -159,8 +163,8 @@ def grafico_reciente(tabla, anos=2):
         2, 1, figsize=(7, 5.5), sharex=True, gridspec_kw={"height_ratios": [3, 1]})
     pintar_fondo(eje, reciente)
     eje.plot(reciente.index, reciente["precio"], color="#0b0b0b", linewidth=1.2, label="S&P 500")
-    eje.plot(reciente.index, reciente["media_50"], color="#eb6834", linewidth=1.2, label="media 50 d")
-    eje.plot(reciente.index, reciente["media_200"], color="#2a78d6", linewidth=1.2, label="media 200 d")
+    eje.plot(reciente.index, reciente["media_corta"], color="#eb6834", linewidth=1.2, label="media 50 d")
+    eje.plot(reciente.index, reciente["media_larga"], color="#2a78d6", linewidth=1.2, label="media 200 d")
     eje.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v:,.0f}"))
     eje.set_title(f"Últimos {anos} años: precio, medias y señal", loc="left")
     # Dos leyendas: las líneas (abajo a la derecha) y los colores de señal.
@@ -270,8 +274,8 @@ def crear_pagina(tabla):
   <table>
     <tr><th>Indicador</th><th>Valor</th></tr>
     <tr><td>S&amp;P 500</td><td>{hoy.precio:,.2f}</td></tr>
-    <tr><td>Media 50 días</td><td>{hoy.media_50:,.2f}</td></tr>
-    <tr><td>Media 200 días</td><td>{hoy.media_200:,.2f}</td></tr>
+    <tr><td>Media 50 días</td><td>{hoy.media_corta:,.2f}</td></tr>
+    <tr><td>Media 200 días</td><td>{hoy.media_larga:,.2f}</td></tr>
     <tr><td>RSI 14 días</td><td>{hoy.rsi:.1f}</td></tr>
     <tr><td>VIX</td><td>{hoy.vix:.2f} ({html.escape(hoy.regimen)})</td></tr>
   </table>

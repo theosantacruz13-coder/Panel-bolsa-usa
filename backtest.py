@@ -88,10 +88,11 @@ def comprar_y_mantener(tabla):
 # EL MOTOR
 # ---------------------------------------------------------------------------
 
-def preparar_datos():
+def preparar_datos(**parametros):
     # Junta en una tabla: señales (calculadas sobre el S&P 500 y el VIX) y
     # precios de apertura y cierre de SPY (ajustados por dividendos).
-    tabla = senales.calcular_senales()
+    # "parametros" (opcional) se pasa a calcular_senales para probar variantes.
+    tabla = senales.calcular_senales(**parametros)
     spy = almacen.leer_diario("SPY")[["apertura", "cierre"]]
     tabla = tabla.join(spy, how="inner")
     # Empezamos el primer día con señal (antes faltan 200 días de historia).

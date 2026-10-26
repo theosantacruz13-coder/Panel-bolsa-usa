@@ -34,9 +34,14 @@ REGIMENES_VIX = [
 ]
 
 
-def regimen_vix(valor_vix):
+def regimen_vix(valor_vix, ajuste=0):
     # Devuelve el nombre del régimen para UN valor del VIX.
+    # "ajuste" mueve todos los límites (15, 20, 30) a la vez: con ajuste=2
+    # serían 17, 22 y 32. Solo se usa para probar la robustez (Fase 3b).
     for nombre, desde, hasta in REGIMENES_VIX:
+        if desde > 0:
+            desde += ajuste
+        hasta += ajuste
         if desde <= valor_vix < hasta:
             return nombre
     return None  # p. ej. si el valor falta (NaN)
@@ -69,13 +74,14 @@ def rsi(precios, periodo=PERIODO_RSI):
     return 100 - 100 / (1 + fuerza)
 
 
-def calcular_indicadores(precio, vix):
+def calcular_indicadores(precio, vix, corta=MEDIA_CORTA, larga=MEDIA_LARGA, ajuste_vix=0):
     # Junta todos los indicadores en una sola tabla (DataFrame).
-    # "precio" y "vix" son series de cierres diarios.
+    # "precio" y "vix" son series de cierres diarios. Los demás parámetros
+    # tienen valores por defecto; solo se cambian para probar la robustez.
     tabla = pd.DataFrame({"precio": precio, "vix": vix}).dropna()
-    tabla["media_50"] = media_movil(tabla["precio"], MEDIA_CORTA)
-    tabla["media_200"] = media_movil(tabla["precio"], MEDIA_LARGA)
+    tabla["media_corta"] = media_movil(tabla["precio"], corta)
+    tabla["media_larga"] = media_movil(tabla["precio"], larga)
     tabla["rsi"] = rsi(tabla["precio"])
     # .map() aplica la función a cada valor de la columna.
-    tabla["regimen"] = tabla["vix"].map(regimen_vix)
+    tabla["regimen"] = tabla["vix"].map(lambda v: regimen_vix(v, ajuste_vix))
     return tabla
