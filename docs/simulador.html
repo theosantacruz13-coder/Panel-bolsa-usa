@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mercado EE.UU. – Fase 4: simulador</title>
+<style>
+  /* Colores como "variables" para poder cambiar a modo oscuro fácilmente */
+  :root { --fondo:#f7f7f5; --tarjeta:#ffffff; --texto:#0b0b0b; --suave:#52514e; --borde:#e6e5e0; }
+  @media (prefers-color-scheme: dark) {
+    :root { --fondo:#121211; --tarjeta:#1a1a19; --texto:#f0efec; --suave:#c3c2b7; --borde:#2e2e2c; }
+  }
+  body { margin:0; background:var(--fondo); color:var(--texto);
+         font:16px/1.5 system-ui, -apple-system, sans-serif; }
+  main { max-width:760px; margin:auto; padding:16px; }
+  h1 { font-size:1.4rem; margin:.2em 0; }
+  h2 { font-size:1.1rem; margin:0 0 .4em; }
+  .sub { color:var(--suave); font-size:.9rem; }
+  .tarjeta { background:var(--tarjeta); border:1px solid var(--borde); border-radius:12px;
+             padding:14px; margin:14px 0; }
+  /* Las imágenes tienen fondo blanco: las ponemos sobre blanco también en modo oscuro */
+  img { width:100%; height:auto; background:#fff; border-radius:8px; }
+  table { width:100%; border-collapse:collapse; font-size:.92rem; font-variant-numeric:tabular-nums; }
+  th, td { padding:6px 4px; border-bottom:1px solid var(--borde); text-align:right; }
+  th:first-child, td:first-child { text-align:left; }
+  .aviso { background:#fdecc8; color:#5a3d00; border-radius:10px; padding:12px; margin:12px 0; }
+  nav a { margin-right:12px; }
+  .cifra { font-size:2rem; font-weight:700; }
+  details summary { cursor:pointer; color:var(--suave); }
+</style>
+<style>
+  .scroll { overflow-x:auto; }
+  .scroll table { min-width:620px; }
+</style>
+</head>
+<body>
+<main>
+<nav class="sub"><a href="index.html">Exploración</a> <a href="senales.html">Señales</a>
+<a href="backtest.html">Backtest</a> <a href="verificacion.html">Verificación</a> <b>Simulador</b></nav>
+<h1>Fase 4: simulador con dinero ficticio</h1>
+<div class="sub">Sin bróker ni dinero real. Mismas reglas que el backtest: señal al cierre,
+orden en la apertura siguiente, comisión 0.05% + deslizamiento 0.05%.</div>
+<div class="tarjeta">
+  <h2>Estrategia completa <span class="sub">▶️ activa</span></h2>
+  <div class="cifra">10,000.00 USD</div>
+  <div>+0.00% desde el 2026-10-26</div>
+  <table>
+    <tr><td>Posición</td><td>fuera del mercado (todo en efectivo)</td></tr>
+    <tr><td>Efectivo</td><td>10,000.00 USD</td></tr>
+    <tr><td>Costes pagados</td><td>0.00 USD</td></tr>
+    <tr><td>Último día procesado</td><td>2026-10-26</td></tr>
+  </table>
+  <p><b>Orden pendiente:</b> COMPRAR en la apertura siguiente al 2026-10-26. <span class='sub'>Registrada 2026-10-27 15:32:11 UTC. COMPRAR: Tendencia alcista: el precio está por encima de la media de 200 días y la media de 50 por encima de la de 200 (precio 7,677, media de 50 días 7,697, media de 200 días 7,295). Además el VIX está en zona «normal» (18.4) y el RSI es 47, sin sobrecompra.</span></p>
+</div><div class="tarjeta">
+  <h2>Comprar y mantener SPY <span class="sub">▶️ activa</span></h2>
+  <div class="cifra">10,000.00 USD</div>
+  <div>+0.00% desde el 2026-10-26</div>
+  <table>
+    <tr><td>Posición</td><td>fuera del mercado (todo en efectivo)</td></tr>
+    <tr><td>Efectivo</td><td>10,000.00 USD</td></tr>
+    <tr><td>Costes pagados</td><td>0.00 USD</td></tr>
+    <tr><td>Último día procesado</td><td>2026-10-26</td></tr>
+  </table>
+  <p><b>Orden pendiente:</b> COMPRAR en la apertura siguiente al 2026-10-26. <span class='sub'>Registrada 2026-10-27 15:32:11 UTC. Comprar y mantener: siempre invertido.</span></p>
+</div>
+<div class="tarjeta">
+  <h2>Comparación en vivo</h2>
+  <p><b>Estrategia completa frente a SPY: +0.00%</b> (1 día(s) de bolsa simulados).</p>
+  <p>El gráfico aparecerá cuando haya al menos 2 días de datos.</p>
+  <p class="sub">Con pocos días, la diferencia es casi pura casualidad. Según el backtest, lo
+  esperable es que la estrategia completa quede algo por detrás de SPY cuando el mercado sube, y
+  que caiga menos en los mercados bajistas largos. Hacen falta meses o años para juzgarla.</p>
+</div>
+<div class="tarjeta">
+  <h2>Operaciones</h2>
+  <div class="scroll"><table>
+    <tr><th>Fecha</th><th>Cartera</th><th>Tipo</th><th>Cant.</th><th>Precio</th><th>Comisión</th><th>Motivo</th></tr>
+    <tr><td colspan="7">Ninguna todavía.</td></tr>
+  </table></div>
+  <p class="sub">Precio de apertura de SPY del día, con deslizamiento. ⚠️ = operación
+  "recuperada": la orden se registró después de esa apertura porque GitHub se saltó alguna noche.
+  El resultado es el mismo que habría salido a tiempo, pero esa decisión no quedó guardada antes.</p>
+</div>
+<div class="tarjeta">
+  <h2>Diario de eventos</h2>
+  <table><tr><th>Cuándo</th><th>Cartera</th><th>Qué</th></tr><tr><td>2026-10-27 15:32:11 UTC</td><td>spy</td><td style='text-align:left'>Cartera creada con 10,000 USD ficticios</td></tr><tr><td>2026-10-27 15:32:11 UTC</td><td>completa</td><td style='text-align:left'>Cartera creada con 10,000 USD ficticios</td></tr></table>
+</div>
+<p class="sub">Simulación educativa. No es asesoramiento financiero.</p>
+</main>
+</body>
+</html>
