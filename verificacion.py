@@ -21,7 +21,7 @@ import pandas as pd
 import almacen
 import backtest as bt
 import config
-from explorar import ESTILO, figura_a_html
+from explorar import ESTILO, navegacion, figura_a_html
 
 
 # Variantes para la robustez (los valores del centro son los de siempre).
@@ -260,8 +260,7 @@ def crear_pagina():
 </head>
 <body>
 <main>
-<nav class="sub"><a href="index.html">Exploración</a> <a href="senales.html">Señales</a>
-<a href="backtest.html">Backtest</a> <b>Verificación</b> <a href="simulador.html">Simulador</a></nav>
+{navegacion("verificacion.html")}
 <h1>Fase 3b: ¿son fiables los resultados?</h1>
 <div class="sub">Datos: {html.escape(origen)} · {inicio:%d/%m/%Y} → {fin:%d/%m/%Y}</div>
 

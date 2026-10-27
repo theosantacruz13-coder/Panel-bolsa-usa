@@ -22,7 +22,7 @@ from matplotlib.patches import Patch
 import almacen
 import config
 import indicadores as ind
-from explorar import ESTILO, eje_de_fechas, figura_a_html
+from explorar import ESTILO, navegacion, eje_de_fechas, figura_a_html
 
 
 # Color e icono de cada señal. El icono hace que la señal se entienda
@@ -262,7 +262,7 @@ def crear_pagina(tabla):
 </head>
 <body>
 <main>
-<nav class="sub"><a href="index.html">Exploración</a> <b>Señales</b> <a href="backtest.html">Backtest</a> <a href="verificacion.html">Verificación</a> <a href="simulador.html">Simulador</a></nav>
+{navegacion("senales.html")}
 <h1>Fase 2: señales</h1>
 <div class="sub">Datos: {html.escape(origen)} · último cierre {fecha_hoy:%d/%m/%Y}</div>
 {aviso}

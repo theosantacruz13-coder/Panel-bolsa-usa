@@ -1,9 +1,9 @@
 # explorar.py
 # FASE 1, paso 2: leer los datos guardados y crear una página web
-# (docs/index.html) con gráficos y explicaciones, pensada para el móvil.
+# (docs/exploracion.html) con gráficos y explicaciones, pensada para el móvil.
 #
 # Cómo se usa:   python explorar.py
-# Luego abre docs/index.html en el navegador.
+# Luego abre docs/exploracion.html en el navegador.
 #
 # Gráficos que crea:
 #   1) Precio de cada índice en el tiempo (S&P 500, Dow Jones, Nasdaq).
@@ -90,6 +90,24 @@ ESTILO = """<style>
   .cifra { font-size:2rem; font-weight:700; }
   details summary { cursor:pointer; color:var(--suave); }
 </style>"""
+
+
+# Páginas del sitio, en el orden del menú: (archivo, nombre).
+PAGINAS = [
+    ("index.html", "Panel"),
+    ("exploracion.html", "Exploración"),
+    ("senales.html", "Señales"),
+    ("backtest.html", "Backtest"),
+    ("verificacion.html", "Verificación"),
+    ("simulador.html", "Simulador"),
+]
+
+
+def navegacion(actual):
+    # Menú común a todas las páginas. La página actual va en negrita.
+    enlaces = [f"<b>{nombre}</b>" if archivo == actual else f'<a href="{archivo}">{nombre}</a>'
+               for archivo, nombre in PAGINAS]
+    return '<nav class="sub">' + " ".join(enlaces) + "</nav>"
 
 
 def figura_a_html(figura, texto_alternativo):
@@ -271,7 +289,7 @@ def crear_pagina():
 </head>
 <body>
 <main>
-<nav class="sub"><b>Exploración</b> <a href="senales.html">Señales</a> <a href="backtest.html">Backtest</a> <a href="verificacion.html">Verificación</a> <a href="simulador.html">Simulador</a></nav>
+{navegacion("exploracion.html")}
 <h1>Mercado de EE.UU. · Fase 1: exploración</h1>
 <div class="sub">Datos: {html.escape(origen)} · actualizado {html.escape(actualizado)}</div>
 {aviso}
@@ -329,7 +347,7 @@ def crear_pagina():
 </html>
 """
     config.CARPETA_WEB.mkdir(parents=True, exist_ok=True)
-    destino = config.CARPETA_WEB / "index.html"
+    destino = config.CARPETA_WEB / "exploracion.html"
     destino.write_text(pagina, encoding="utf-8")
     print(f"✅ Página creada: {destino}")
     print(f"   Correlación diaria VIX ↔ S&P 500: {correlacion:+.2f}")

@@ -13,7 +13,7 @@ import pandas as pd
 import almacen
 import backtest as bt
 import config
-from explorar import ESTILO, eje_de_fechas, figura_a_html
+from explorar import ESTILO, navegacion, eje_de_fechas, figura_a_html
 
 
 # Un color fijo por estrategia, el mismo en todos los gráficos.
@@ -224,7 +224,7 @@ def crear_pagina():
 </head>
 <body>
 <main>
-<nav class="sub"><a href="index.html">Exploración</a> <a href="senales.html">Señales</a> <b>Backtest</b> <a href="verificacion.html">Verificación</a> <a href="simulador.html">Simulador</a></nav>
+{navegacion("backtest.html")}
 <h1>Fase 3: backtest honesto</h1>
 <div class="sub">Datos: {html.escape(origen)} · {inicio:%d/%m/%Y} → {fin:%d/%m/%Y} ·
 10.000 USD ficticios en SPY · comisión {bt.COMISION:.2%} + deslizamiento {bt.DESLIZAMIENTO:.2%} por operación</div>

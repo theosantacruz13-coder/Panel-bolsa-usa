@@ -17,7 +17,7 @@ con comentarios en español, y pensado para aprender desde cero.
 | 3 | Backtesting honesto (comisiones, deslizamiento, entrenamiento/prueba, vs SPY) | `backtest.py`, `informe_backtest.py` | ✅ Hecha |
 | 3b | Verificación: look-ahead, robustez (27 variantes) y walk-forward | `verificacion.py`, `tests/` | ✅ Hecha |
 | 4 | Simulador diario con dos carteras ficticias de 10.000 USD (estrategia completa y SPY) | `simulador.py`, `informe_simulador.py` | ✅ Hecha |
-| 5 | Dashboard HTML para el móvil | — | ⏳ Pendiente |
+| 5 | Panel para el móvil: mercado, señal, carteras, operaciones y resultado frente a SPY | `dashboard.py` | ✅ Hecha |
 
 ## Activos que seguimos
 
@@ -39,7 +39,7 @@ config.py            ← tickers, fechas y rutas (lo único que hay que tocar pa
 almacen.py           ← guardar y leer precios en SQLite (lo usarán todas las fases)
 descargar_datos.py   ← FASE 1: descarga precios REALES de Yahoo Finance
 datos_ejemplo.py     ← FASE 1: genera precios INVENTADOS para probar sin internet
-explorar.py          ← FASE 1: crea docs/index.html con gráficos y explicaciones
+explorar.py          ← FASE 1: crea docs/exploracion.html con gráficos y explicaciones
 indicadores.py       ← FASE 2: régimen del VIX, medias móviles 50/200 y RSI
 senales.py           ← FASE 2: reglas COMPRAR/MANTENER/REDUCIR y docs/senales.html
 backtest.py          ← FASE 3: motor de simulación con comisiones, deslizamiento y métricas
@@ -47,10 +47,12 @@ informe_backtest.py  ← FASE 3: ejecuta las pruebas y crea docs/backtest.html
 verificacion.py      ← FASE 3b: robustez y walk-forward, crea docs/verificacion.html
 simulador.py         ← FASE 4: carteras ficticias que avanzan cada día (datos/cartera.db)
 informe_simulador.py ← FASE 4: crea docs/simulador.html
+dashboard.py         ← FASE 5: crea el panel docs/index.html
 tests/               ← pruebas automáticas (look-ahead bias y simulador = backtest)
 datos/mercado.db     ← base de datos SQLite (se crea al descargar)
 datos/csv/           ← copia de los datos en CSV, un archivo por activo
-docs/index.html      ← página de exploración (Fase 1)
+docs/index.html      ← PANEL principal (Fase 5)
+docs/exploracion.html ← página de exploración (Fase 1)
 docs/senales.html    ← página de señales (Fase 2)
 docs/backtest.html   ← página del backtest (Fase 3)
 .github/workflows/   ← automatización: GitHub descarga los datos por ti
@@ -74,7 +76,7 @@ MAYÚSCULAS al principio, y un generador de datos de ejemplo para trabajar sin c
 ```bash
 pip install -r requirements.txt   # instala las librerías (una sola vez)
 python descargar_datos.py         # descarga los datos reales (1-2 minutos)
-python explorar.py                # crea docs/index.html
+python explorar.py                # crea docs/exploracion.html
 python senales.py                 # crea docs/senales.html
 python informe_backtest.py        # crea docs/backtest.html (tarda ~1 minuto)
 python verificacion.py            # crea docs/verificacion.html (tarda ~1-2 minutos)
@@ -139,6 +141,20 @@ noche, la siguiente ejecución recupera los días perdidos y marca esas operacio
 - **Reiniciar**: borra el historial de esa cartera y empieza de nuevo con 10.000 USD.
 
 En el ordenador: `python simulador.py estado` (o `ejecutar`, `pausar spy`, `reiniciar todas`...).
+
+## El panel (Fase 5)
+
+`docs/index.html` reúne en una pantalla para el móvil: el VIX y su régimen, el S&P 500, la señal
+del último cierre con su razón, las dos carteras ficticias, el gráfico de su valor frente a SPY
+(tócalo para ver los valores de cada día), las órdenes para la próxima apertura, las últimas
+operaciones y lo que dijo el backtest.
+
+Se actualiza solo: GitHub lo rehace cada noche, la página se recarga cada 15 minutos si está
+abierta, dice cuánto hace que se actualizó y avisa si los datos tienen más de 4 días.
+Solo usa días de bolsa ya cerrados.
+
+Para verlo desde el móvil, con el repositorio público: **Settings → Pages → Deploy from a branch
+→ `main` / `/docs`**. La dirección será `https://theosantacruz13-coder.github.io/Simulador-bolsa-usa/`.
 
 ## Datos que se guardan
 
