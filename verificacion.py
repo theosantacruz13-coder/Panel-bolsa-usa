@@ -261,7 +261,7 @@ def crear_pagina():
 <body>
 <main>
 <nav class="sub"><a href="index.html">Exploración</a> <a href="senales.html">Señales</a>
-<a href="backtest.html">Backtest</a> <b>Verificación</b></nav>
+<a href="backtest.html">Backtest</a> <b>Verificación</b> <a href="simulador.html">Simulador</a></nav>
 <h1>Fase 3b: ¿son fiables los resultados?</h1>
 <div class="sub">Datos: {html.escape(origen)} · {inicio:%d/%m/%Y} → {fin:%d/%m/%Y}</div>
 

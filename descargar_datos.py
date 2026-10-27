@@ -68,7 +68,14 @@ def a_formato_nuestro(df, formato_fecha, columna_tiempo):
         # cotiza también de madrugada y "prepost=False" no lo filtra.
         df = df.between_time("09:30", "15:55")
     df[columna_tiempo] = df.index.strftime(formato_fecha)
-    return df[[columna_tiempo] + almacen.COLUMNAS_PRECIO]
+    # A veces Yahoo devuelve el último día con los precios VACÍOS (NaN),
+    # sobre todo en los ETF. No guardamos esas filas: la próxima descarga
+    # traerá el día completo. (Pasó con SPY, QQQ y DIA el 26/10/2026.)
+    vacias = df["apertura"].isna() | df["cierre"].isna()
+    if vacias.any():
+        print(f"   ⚠️  {vacias.sum()} fila(s) sin precio, no se guardan: "
+              f"{', '.join(df.loc[vacias, columna_tiempo])}")
+    return df.loc[~vacias, [columna_tiempo] + almacen.COLUMNAS_PRECIO]
 
 
 def descargar_todo():
@@ -120,6 +127,9 @@ if __name__ == "__main__":
 
     # Anotamos que estos datos son reales (explorar.py lo comprueba).
     if len(fallidos) < len(config.TODOS):
+        vacias = almacen.borrar_filas_sin_precio()
+        if vacias:
+            print(f"\nBorradas {vacias} filas antiguas sin precio.")
         borradas = almacen.borrar_fuera_de_horario()
         if borradas:
             print(f"\nBorradas {borradas} velas fuera del horario normal de mercado.")

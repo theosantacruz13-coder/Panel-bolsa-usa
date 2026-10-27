@@ -109,6 +109,18 @@ def borrar_fuera_de_horario():
     return cursor.rowcount
 
 
+def borrar_filas_sin_precio():
+    # Borra filas guardadas con el precio de apertura o de cierre vacío
+    # (NULL en SQL). Devuelve cuántas filas borró en total.
+    total = 0
+    with conectar() as conexion:
+        for tabla in ["diario", "intradia"]:
+            cursor = conexion.execute(
+                f"DELETE FROM {tabla} WHERE apertura IS NULL OR cierre IS NULL")
+            total += cursor.rowcount
+    return total
+
+
 def guardar_metadato(clave, valor):
     # Apunta una nota en la tabla "metadatos" (p. ej. origen = 'yahoo').
     with conectar() as conexion:

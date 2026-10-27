@@ -16,7 +16,7 @@ con comentarios en español, y pensado para aprender desde cero.
 | 2 | Señales: régimen VIX, medias 50/200, RSI → COMPRAR / MANTENER / REDUCIR | `indicadores.py`, `senales.py` | ✅ Hecha |
 | 3 | Backtesting honesto (comisiones, deslizamiento, entrenamiento/prueba, vs SPY) | `backtest.py`, `informe_backtest.py` | ✅ Hecha |
 | 3b | Verificación: look-ahead, robustez (27 variantes) y walk-forward | `verificacion.py`, `tests/` | ✅ Hecha |
-| 4 | Simulador en tiempo real con cartera virtual de 10.000 USD | — | ⏳ Pendiente |
+| 4 | Simulador diario con dos carteras ficticias de 10.000 USD (estrategia completa y SPY) | `simulador.py`, `informe_simulador.py` | ✅ Hecha |
 | 5 | Dashboard HTML para el móvil | — | ⏳ Pendiente |
 
 ## Activos que seguimos
@@ -45,7 +45,9 @@ senales.py           ← FASE 2: reglas COMPRAR/MANTENER/REDUCIR y docs/senales.
 backtest.py          ← FASE 3: motor de simulación con comisiones, deslizamiento y métricas
 informe_backtest.py  ← FASE 3: ejecuta las pruebas y crea docs/backtest.html
 verificacion.py      ← FASE 3b: robustez y walk-forward, crea docs/verificacion.html
-tests/               ← pruebas automáticas contra el look-ahead bias
+simulador.py         ← FASE 4: carteras ficticias que avanzan cada día (datos/cartera.db)
+informe_simulador.py ← FASE 4: crea docs/simulador.html
+tests/               ← pruebas automáticas (look-ahead bias y simulador = backtest)
 datos/mercado.db     ← base de datos SQLite (se crea al descargar)
 datos/csv/           ← copia de los datos en CSV, un archivo por activo
 docs/index.html      ← página de exploración (Fase 1)
@@ -112,6 +114,31 @@ actuar en la sesión siguiente (importante para no hacer trampas en la Fase 3).
   (entrar con VIX < 20, salir con VIX ≥ 30) y **comprar y mantener SPY** como referencia.
 - Entrenamiento 2007-2016 y prueba 2017-hoy, más dos experimentos: sobreajuste de umbrales
   y el efecto de ejecutar "con trampa" al cierre del mismo día.
+
+## El simulador (Fase 4)
+
+Dos carteras **ficticias** de 10.000 USD avanzan en paralelo: la **estrategia completa** y
+**comprar y mantener SPY**. Usan exactamente las mismas reglas y el mismo código de compra y
+venta que el backtest (`backtest.ejecutar_orden`), y una prueba automática comprueba que el
+simulador y el backtest dan el mismo resultado día a día. No hay stop-loss ni reglas nuevas.
+
+Cada noche (GitHub Actions, tras el cierre), para cada día de bolsa ya cerrado:
+
+1. Ejecuta la orden pendiente al **precio de apertura** real de ese día (con comisión y deslizamiento).
+2. Calcula la señal con el **cierre** y apunta la orden para la apertura siguiente.
+3. Guarda el valor de la cartera.
+
+La orden queda guardada en git **antes** de la apertura siguiente. Si GitHub se salta alguna
+noche, la siguiente ejecución recupera los días perdidos y marca esas operaciones con ⚠️.
+
+**Desde el móvil**: *Actions → Actualizar datos → Run workflow* y elige en el menú:
+`ejecutar` (lo normal), `pausar`, `reanudar` o `reiniciar`, y la cartera (`todas`, `completa`, `spy`).
+
+- **Pausar**: no se crean ni ejecutan órdenes (se cancela la pendiente); el valor se sigue apuntando.
+- **Reanudar**: la siguiente señal vuelve a generar órdenes.
+- **Reiniciar**: borra el historial de esa cartera y empieza de nuevo con 10.000 USD.
+
+En el ordenador: `python simulador.py estado` (o `ejecutar`, `pausar spy`, `reiniciar todas`...).
 
 ## Datos que se guardan
 
