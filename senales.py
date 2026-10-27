@@ -262,7 +262,7 @@ def crear_pagina(tabla):
 </head>
 <body>
 <main>
-<nav class="sub"><a href="index.html">Exploración</a> <b>Señales</b> <a href="backtest.html">Backtest</a></nav>
+<nav class="sub"><a href="index.html">Exploración</a> <b>Señales</b> <a href="backtest.html">Backtest</a> <a href="verificacion.html">Verificación</a> <a href="simulador.html">Simulador</a></nav>
 <h1>Fase 2: señales</h1>
 <div class="sub">Datos: {html.escape(origen)} · último cierre {fecha_hoy:%d/%m/%Y}</div>
 {aviso}

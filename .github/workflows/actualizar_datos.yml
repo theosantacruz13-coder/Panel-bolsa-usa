@@ -1,12 +1,26 @@
 # GitHub Actions: un ordenador de GitHub ejecuta estos pasos por nosotros,
 # gratis, aunque tengamos el móvil apagado. Descarga datos REALES de Yahoo,
-# rehace la página web y guarda (commit) el resultado en el repositorio.
+# rehace las páginas, avanza el simulador y guarda (commit) el resultado.
 name: Actualizar datos
 
 on:
   # Botón "Run workflow" en la pestaña Actions (se puede pulsar desde el móvil).
+  # Al pulsarlo aparece un menú para elegir qué hacer con el simulador.
   workflow_dispatch:
+    inputs:
+      accion:
+        description: "Qué hacer"
+        type: choice
+        default: ejecutar
+        options: [ejecutar, pausar, reanudar, reiniciar]
+      estrategia:
+        description: "Cartera (solo para pausar, reanudar o reiniciar)"
+        type: choice
+        default: todas
+        options: [todas, completa, spy]
   # Automático: de lunes a viernes a las 21:30 UTC, después del cierre de Wall Street.
+  # (GitHub suele arrancarlo con 2-3 horas de retraso; no importa, el simulador
+  # solo procesa días ya cerrados y recupera los que falten.)
   schedule:
     - cron: "30 21 * * 1-5"
 
@@ -14,9 +28,18 @@ on:
 permissions:
   contents: write
 
+# Nunca dos ejecuciones a la vez (evita que se pisen al guardar la cartera).
+concurrency:
+  group: actualizar-datos
+  cancel-in-progress: false
+
 jobs:
   actualizar:
     runs-on: ubuntu-latest
+    env:
+      # En las ejecuciones automáticas no hay menú: la acción es "ejecutar".
+      ACCION: ${{ inputs.accion || 'ejecutar' }}
+      ESTRATEGIA: ${{ inputs.estrategia || 'todas' }}
     steps:
       - name: Descargar el código del repositorio
         uses: actions/checkout@v4
@@ -30,21 +53,31 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Descargar precios de Yahoo Finance
+        if: env.ACCION == 'ejecutar'
         run: python descargar_datos.py
 
       - name: Crear la página con los gráficos
+        if: env.ACCION == 'ejecutar'
         run: python explorar.py
 
       - name: Calcular las señales y crear su página
+        if: env.ACCION == 'ejecutar'
         run: python senales.py
 
       - name: Repetir el backtest y crear su página
+        if: env.ACCION == 'ejecutar'
         run: python informe_backtest.py
+
+      - name: Simulador (ejecutar el día, pausar, reanudar o reiniciar)
+        run: python simulador.py "$ACCION" "$ESTRATEGIA"
+
+      - name: Crear la página del simulador
+        run: python informe_simulador.py
 
       - name: Guardar los resultados en el repositorio
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
-          git add -f datos/ docs/index.html docs/senales.html docs/backtest.html
-          git commit -m "Datos actualizados $(date -u '+%Y-%m-%d %H:%M UTC')" || echo "Sin cambios"
+          git add -f datos/ docs/index.html docs/senales.html docs/backtest.html docs/simulador.html
+          git commit -m "Simulador: $ACCION ($ESTRATEGIA) $(date -u '+%Y-%m-%d %H:%M UTC')" || echo "Sin cambios"
           git push

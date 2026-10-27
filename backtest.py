@@ -94,10 +94,50 @@ def preparar_datos(**parametros):
     # "parametros" (opcional) se pasa a calcular_senales para probar variantes.
     tabla = senales.calcular_senales(**parametros)
     spy = almacen.leer_diario("SPY")[["apertura", "cierre"]]
-    tabla = tabla.join(spy, how="inner")
+    # Sin precio de SPY no se puede operar: quitamos los días incompletos.
+    tabla = tabla.join(spy, how="inner").dropna(subset=["apertura", "cierre"])
     # Empezamos el primer día con señal (antes faltan 200 días de historia).
     primer_dia = tabla.index[(tabla["senal"] != "SIN DATOS").argmax()]
     return tabla.loc[primer_dia:]
+
+
+def cartera_nueva():
+    # Estado inicial de una cartera: todo en efectivo.
+    return {"efectivo": float(CAPITAL_INICIAL), "acciones": 0, "costes": 0.0, "abierta": None}
+
+
+def ejecutar_orden(estado, objetivo, precio):
+    # Compra o vende TODO para llegar a la posición objetivo (1 = dentro,
+    # 0 = fuera), al "precio" de mercado indicado (la apertura del día).
+    # Modifica "estado" y devuelve un resumen del movimiento, o None si no
+    # hizo falta hacer nada. La usan backtest.py y simulador.py.
+    if objetivo == 1 and estado["acciones"] == 0:
+        precio_real = precio * (1 + DESLIZAMIENTO)
+        # Cuántas acciones enteras podemos pagar, comisión incluida.
+        # math.floor redondea hacia abajo (no se compran trozos).
+        n = math.floor(estado["efectivo"] / (precio_real * (1 + COMISION)))
+        if n == 0:
+            return None
+        importe = n * precio_real
+        comision = importe * COMISION
+        estado["efectivo"] -= importe + comision
+        estado["acciones"] = n
+        deslizamiento = n * (precio_real - precio)
+        tipo = "COMPRA"
+    elif objetivo == 0 and estado["acciones"] > 0:
+        n = estado["acciones"]
+        precio_real = precio * (1 - DESLIZAMIENTO)
+        importe = n * precio_real
+        comision = importe * COMISION
+        estado["efectivo"] += importe - comision
+        estado["acciones"] = 0
+        deslizamiento = n * (precio - precio_real)
+        tipo = "VENTA"
+    else:
+        return None  # ya estábamos en la posición pedida
+    estado["costes"] += comision + deslizamiento
+    return {"tipo": tipo, "cantidad": n, "precio": precio_real, "importe": importe,
+            "comision": comision, "deslizamiento": deslizamiento}
 
 
 def simular(tabla, posicion_deseada, inicio=None, fin=None, ejecutar_mismo_dia=False):
@@ -112,42 +152,30 @@ def simular(tabla, posicion_deseada, inicio=None, fin=None, ejecutar_mismo_dia=F
     datos = tabla.loc[inicio:fin]
     deseada = posicion_deseada.loc[datos.index]
 
-    efectivo = CAPITAL_INICIAL
-    acciones = 0
-    costes = 0.0
+    # El "estado" de la cartera se guarda en un diccionario. El simulador en
+    # vivo (simulador.py) usa exactamente el mismo diccionario y la misma
+    # función ejecutar_orden(), así las reglas son idénticas en los dos.
+    estado = cartera_nueva()
     operaciones = []
-    abierta = None      # la operación en curso (si estamos dentro)
     pendiente = None    # orden decidida ayer, a ejecutar hoy en la apertura
     valores, invertido = [], []
 
     def ejecutar(objetivo, precio, fecha):
-        # Compra o vende TODO para llegar a la posición objetivo (0 o 1).
-        # "nonlocal" permite modificar variables de la función de fuera.
-        nonlocal efectivo, acciones, costes, abierta
-        if objetivo == 1 and acciones == 0:
-            precio_real = precio * (1 + DESLIZAMIENTO)
-            # Cuántas acciones enteras podemos pagar, comisión incluida.
-            # math.floor redondea hacia abajo (no se compran trozos).
-            n = math.floor(efectivo / (precio_real * (1 + COMISION)))
-            if n == 0:
-                return
-            importe = n * precio_real
-            comision = importe * COMISION
-            efectivo -= importe + comision
-            acciones = n
-            costes += comision + n * (precio_real - precio)
-            abierta = {"entrada": fecha, "precio_entrada": precio_real,
-                       "coste_entrada": importe + comision, "acciones": n}
-        elif objetivo == 0 and acciones > 0:
-            precio_real = precio * (1 - DESLIZAMIENTO)
-            importe = acciones * precio_real
-            comision = importe * COMISION
-            efectivo += importe - comision
-            costes += comision + acciones * (precio - precio_real)
-            abierta.update({"salida": fecha, "precio_salida": precio_real,
-                            "resultado": (importe - comision) / abierta["coste_entrada"] - 1})
+        movimiento = ejecutar_orden(estado, objetivo, precio)
+        if movimiento is None:
+            return
+        # Agrupamos compra + venta en una "operación" para las estadísticas.
+        if movimiento["tipo"] == "COMPRA":
+            estado["abierta"] = {"entrada": fecha, "precio_entrada": movimiento["precio"],
+                                 "coste_entrada": movimiento["importe"] + movimiento["comision"],
+                                 "acciones": movimiento["cantidad"]}
+        else:
+            abierta = estado["abierta"]
+            abierta.update({"salida": fecha, "precio_salida": movimiento["precio"],
+                            "resultado": (movimiento["importe"] - movimiento["comision"])
+                            / abierta["coste_entrada"] - 1})
             operaciones.append(abierta)
-            acciones, abierta = 0, None
+            estado["abierta"] = None
 
     for fecha, fila in datos.iterrows():
         # 1) Por la mañana: ejecutar la orden que se decidió ayer.
@@ -164,14 +192,15 @@ def simular(tabla, posicion_deseada, inicio=None, fin=None, ejecutar_mismo_dia=F
                 pendiente = objetivo                    # ✅ honesto: mañana en la apertura
 
         # 3) Apuntar cuánto vale la cartera al cierre.
-        valores.append(efectivo + acciones * fila.cierre)
-        invertido.append(acciones > 0)
+        valores.append(estado["efectivo"] + estado["acciones"] * fila.cierre)
+        invertido.append(estado["acciones"] > 0)
 
     # Si al final seguimos dentro, apuntamos la operación como "abierta",
     # valorada al último cierre (sin costes de venta, porque no se vendió).
+    abierta = estado["abierta"]
     if abierta is not None:
         ultimo = datos.index[-1]
-        valor_actual = acciones * datos["cierre"].iloc[-1]
+        valor_actual = estado["acciones"] * datos["cierre"].iloc[-1]
         abierta.update({"salida": ultimo, "precio_salida": datos["cierre"].iloc[-1],
                         "resultado": valor_actual / abierta["coste_entrada"] - 1,
                         "sigue_abierta": True})
@@ -181,7 +210,7 @@ def simular(tabla, posicion_deseada, inicio=None, fin=None, ejecutar_mismo_dia=F
         "valor": pd.Series(valores, index=datos.index),
         "invertido": pd.Series(invertido, index=datos.index),
         "operaciones": operaciones,
-        "costes": costes,
+        "costes": estado["costes"],
     }
 
 
