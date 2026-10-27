@@ -15,6 +15,7 @@ con comentarios en español, y pensado para aprender desde cero.
 | 1 | Descarga de datos y exploración con gráficos | `config.py`, `almacen.py`, `descargar_datos.py`, `datos_ejemplo.py`, `explorar.py` | ✅ Hecha |
 | 2 | Señales: régimen VIX, medias 50/200, RSI → COMPRAR / MANTENER / REDUCIR | `indicadores.py`, `senales.py` | ✅ Hecha |
 | 3 | Backtesting honesto (comisiones, deslizamiento, entrenamiento/prueba, vs SPY) | `backtest.py`, `informe_backtest.py` | ✅ Hecha |
+| 3b | Verificación: look-ahead, robustez (27 variantes) y walk-forward | `verificacion.py`, `tests/` | ✅ Hecha |
 | 4 | Simulador en tiempo real con cartera virtual de 10.000 USD | — | ⏳ Pendiente |
 | 5 | Dashboard HTML para el móvil | — | ⏳ Pendiente |
 
@@ -43,6 +44,8 @@ indicadores.py       ← FASE 2: régimen del VIX, medias móviles 50/200 y RSI
 senales.py           ← FASE 2: reglas COMPRAR/MANTENER/REDUCIR y docs/senales.html
 backtest.py          ← FASE 3: motor de simulación con comisiones, deslizamiento y métricas
 informe_backtest.py  ← FASE 3: ejecuta las pruebas y crea docs/backtest.html
+verificacion.py      ← FASE 3b: robustez y walk-forward, crea docs/verificacion.html
+tests/               ← pruebas automáticas contra el look-ahead bias
 datos/mercado.db     ← base de datos SQLite (se crea al descargar)
 datos/csv/           ← copia de los datos en CSV, un archivo por activo
 docs/index.html      ← página de exploración (Fase 1)
@@ -72,6 +75,8 @@ python descargar_datos.py         # descarga los datos reales (1-2 minutos)
 python explorar.py                # crea docs/index.html
 python senales.py                 # crea docs/senales.html
 python informe_backtest.py        # crea docs/backtest.html (tarda ~1 minuto)
+python verificacion.py            # crea docs/verificacion.html (tarda ~1-2 minutos)
+python -m unittest discover tests  # pruebas automáticas
 ```
 
 Sin internet, puedes probar con datos inventados:
