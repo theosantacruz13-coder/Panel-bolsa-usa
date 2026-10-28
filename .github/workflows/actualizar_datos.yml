@@ -56,7 +56,7 @@ jobs:
         if: env.ACCION == 'ejecutar'
         run: python descargar_datos.py
 
-      - name: Crear la página con los gráficos
+      - name: Crear la página de exploración
         if: env.ACCION == 'ejecutar'
         run: python explorar.py
 
@@ -74,10 +74,13 @@ jobs:
       - name: Crear la página del simulador
         run: python informe_simulador.py
 
+      - name: Crear el panel principal (docs/index.html)
+        run: python dashboard.py
+
       - name: Guardar los resultados en el repositorio
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
-          git add -f datos/ docs/index.html docs/senales.html docs/backtest.html docs/simulador.html
+          git add -f datos/ docs/index.html docs/exploracion.html docs/senales.html docs/backtest.html docs/simulador.html
           git commit -m "Simulador: $ACCION ($ESTRATEGIA) $(date -u '+%Y-%m-%d %H:%M UTC')" || echo "Sin cambios"
           git push

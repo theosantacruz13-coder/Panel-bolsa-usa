@@ -13,7 +13,7 @@ import pandas as pd
 import backtest as bt
 import config
 import simulador as sim
-from explorar import ESTILO, figura_a_html
+from explorar import ESTILO, navegacion, figura_a_html
 
 COLORES = {"completa": "#2a78d6", "spy": "#0b0b0b"}
 
@@ -134,8 +134,7 @@ def crear_pagina(base=None):
 </head>
 <body>
 <main>
-<nav class="sub"><a href="index.html">Exploración</a> <a href="senales.html">Señales</a>
-<a href="backtest.html">Backtest</a> <a href="verificacion.html">Verificación</a> <b>Simulador</b></nav>
+{navegacion("simulador.html")}
 <h1>Fase 4: simulador con dinero ficticio</h1>
 <div class="sub">Sin bróker ni dinero real. Mismas reglas que el backtest: señal al cierre,
 orden en la apertura siguiente, comisión {bt.COMISION:.2%} + deslizamiento {bt.DESLIZAMIENTO:.2%}.</div>

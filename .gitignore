@@ -2,6 +2,7 @@
 # GitHub Actions los añade a la fuerza ("git add -f") cuando son REALES.
 datos/
 docs/index.html
+docs/exploracion.html
 docs/senales.html
 docs/backtest.html
 docs/simulador.html
