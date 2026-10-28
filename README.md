@@ -1,4 +1,6 @@
-# simulador-bolsa-usa
+# Panel-bolsa-usa
+
+📱 **Panel en vivo:** https://theosantacruz13-coder.github.io/Panel-bolsa-usa/
 
 Sistema **educativo** para analizar el mercado de acciones de EE.UU. y
 **simular** inversiones con dinero ficticio. Está escrito en Python paso a paso,
@@ -153,8 +155,9 @@ Se actualiza solo: GitHub lo rehace cada noche, la página se recarga cada 15 mi
 abierta, dice cuánto hace que se actualizó y avisa si los datos tienen más de 4 días.
 Solo usa días de bolsa ya cerrados.
 
-Para verlo desde el móvil, con el repositorio público: **Settings → Pages → Deploy from a branch
-→ `main` / `/docs`**. La dirección será `https://theosantacruz13-coder.github.io/Simulador-bolsa-usa/`.
+Se publica con GitHub Pages (**Settings → Pages → Deploy from a branch → `main` / `/docs`**) en
+**https://theosantacruz13-coder.github.io/Panel-bolsa-usa/**. Guárdala en la pantalla de inicio del
+móvil para abrirla como una app.
 
 ## Datos que se guardan
 
