@@ -58,48 +58,48 @@
 <main>
 <nav class="sub"><b>Panel</b> <a href="exploracion.html">Exploración</a> <a href="senales.html">Señales</a> <a href="backtest.html">Backtest</a> <a href="verificacion.html">Verificación</a> <a href="simulador.html">Simulador</a></nav>
 <h1>Panel del mercado de EE.UU.</h1>
-<div class="sub">Último cierre 02/11/2026 · actualizado
-<span id="actualizado" data-iso="2026-11-04T01:31:00.099037+00:00">04/11 01:31 UTC</span></div>
+<div class="sub">Último cierre 03/11/2026 · actualizado
+<span id="actualizado" data-iso="2026-11-05T01:33:01.846966+00:00">05/11 01:33 UTC</span></div>
 <div id="viejo" class="aviso" hidden>⚠️ Los datos tienen más de 4 días: puede que la
 actualización automática de GitHub haya fallado (pestaña Actions).</div>
 
 <div class="fichas">
   <div class="ficha">
     <div class="etiqueta">VIX</div>
-    <div class="cifra">21.1</div>
+    <div class="cifra">20.8</div>
     <div><span class="chip" style="background:#fdf0d8;color:#7a4a00">▲ nervioso</span>
-      <span class="sub">+1.7</span></div>
+      <span class="sub">-0.3</span></div>
   </div>
   <div class="ficha">
     <div class="etiqueta">S&amp;P 500</div>
-    <div class="cifra">7,541</div>
-    <div class="sub">-0.5% en el día</div>
+    <div class="cifra">7,569</div>
+    <div class="sub">+0.4% en el día</div>
   </div>
   <div class="ficha ancha">
     <div class="etiqueta">Señal al cierre</div>
     <div class="cifra" style="color:#1baf7a">▲ COMPRAR</div>
-    <div class="sub">Tendencia alcista: el precio está por encima de la media de 200 días y la media de 50 por encima de la de 200 (precio 7,541, media de 50 días 7,694, media de 200 días 7,313). Además el VIX está en zona «nervioso» (21.1) y el RSI es 38, sin sobrecompra.</div>
+    <div class="sub">Tendencia alcista: el precio está por encima de la media de 200 días y la media de 50 por encima de la de 200 (precio 7,569, media de 50 días 7,693, media de 200 días 7,316). Además el VIX está en zona «nervioso» (20.8) y el RSI es 40, sin sobrecompra.</div>
   </div>
 </div>
 <h2>Carteras ficticias</h2>
 <div class="fichas"><div class="ficha">
     <div class="etiqueta"><span class="clave completa"></span>Estrategia completa</div>
-    <div class="cifra">9,792 <span class="sub">USD</span></div>
-    <div>-2.1% <span class="sub">desde 2026-10-26</span></div>
+    <div class="cifra">9,821 <span class="sub">USD</span></div>
+    <div>-1.8% <span class="sub">desde 2026-10-26</span></div>
     <div class="sub">13 acc. SPY · efectivo 15</div>
   </div><div class="ficha">
     <div class="etiqueta"><span class="clave spy"></span>Comprar y mantener SPY</div>
-    <div class="cifra">9,792 <span class="sub">USD</span></div>
-    <div>-2.1% <span class="sub">desde 2026-10-26</span></div>
+    <div class="cifra">9,821 <span class="sub">USD</span></div>
+    <div>-1.8% <span class="sub">desde 2026-10-26</span></div>
     <div class="sub">13 acc. SPY · efectivo 15</div>
   </div></div>
 <div class="tarjeta">
   <h2>Resultado frente a SPY</h2>
-  <p>La estrategia completa va <b>empatada con</b> comprar y mantener SPY: <b>+0.00%</b> tras 6 día(s) de bolsa.</p>
+  <p>La estrategia completa va <b>empatada con</b> comprar y mantener SPY: <b>+0.00%</b> tras 7 día(s) de bolsa.</p>
   <div id="grafico" class="grafico" role="img"
   aria-label="Valor diario de las dos carteras ficticias"></div>
 <div class="leyenda"><span><span class="clave completa"></span>Estrategia completa</span><span><span class="clave spy"></span>Comprar y mantener SPY</span></div>
-<script id="datos-grafico" type="application/json">{"fechas": ["2026-10-26", "2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02"], "series": [{"clave": "completa", "nombre": "Estrategia completa", "valores": [10000.0, 10016.54, 10054.63, 10016.28, 9838.96, 9791.9]}, {"clave": "spy", "nombre": "Comprar y mantener SPY", "valores": [10000.0, 10016.54, 10054.63, 10016.28, 9838.96, 9791.9]}]}</script>
+<script id="datos-grafico" type="application/json">{"fechas": ["2026-10-26", "2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03"], "series": [{"clave": "completa", "nombre": "Estrategia completa", "valores": [10000.0, 10016.54, 10054.63, 10016.28, 9838.96, 9791.9, 9821.15]}, {"clave": "spy", "nombre": "Comprar y mantener SPY", "valores": [10000.0, 10016.54, 10054.63, 10016.28, 9838.96, 9791.9, 9821.15]}]}</script>
   <p class="sub">Con pocos días la diferencia es casi pura casualidad. Mientras la señal sea
   COMPRAR, las dos carteras van prácticamente igual.</p>
 </div>
@@ -112,7 +112,7 @@ actualización automática de GitHub haya fallado (pestaña Actions).</div>
 </div>
 <div class="tarjeta">
   <h2>Qué esperar (backtest 2007-hoy)</h2>
-  <table><tr><th>Cartera</th><th>Anual</th><th>Caída máx.</th><th>Sharpe</th></tr><tr><td><span class='clave completa'></span>Estrategia completa</td><td>+7.6%</td><td>-19.6%</td><td>0.72</td></tr><tr><td><span class='clave spy'></span>Comprar y mantener SPY</td><td>+10.7%</td><td>-54.6%</td><td>0.62</td></tr></table>
+  <table><tr><th>Cartera</th><th>Anual</th><th>Caída máx.</th><th>Sharpe</th></tr><tr><td><span class='clave completa'></span>Estrategia completa</td><td>+7.6%</td><td>-19.6%</td><td>0.73</td></tr><tr><td><span class='clave spy'></span>Comprar y mantener SPY</td><td>+10.7%</td><td>-54.6%</td><td>0.62</td></tr></table>
   <p class="sub">La estrategia <b>no superó</b> a comprar y mantener en rentabilidad; su ventaja fue
   caer menos en los mercados bajistas largos. Ver <a href="backtest.html">Backtest</a> y
   <a href="verificacion.html">Verificación</a>.</p>
